@@ -30,9 +30,23 @@ bool Bullet::update()
 	_bulletX += _direction.x * BULLET_VEL;
 	_box.x = (int)_bulletX;
 
+	//If the bullet went too far to the left or right or touched a wall or an enemy
+	if (_bulletX < 0 || _bulletX + BULLET_WIDTH > LEVEL_WIDTH || level.touchesWall(_box) || touchesEnemy())
+	{
+		//Return true -> delete this bullet
+		return true;
+	}
+
 	//Move the bullet up or down
 	_bulletY += _direction.y * BULLET_VEL;
 	_box.y = (int)_bulletY;
+
+	//If the bullet went too far up or down or touched a wall or an enemy
+	if (_bulletY < 0 || _bulletY + BULLET_HEIGHT > LEVEL_HEIGHT || level.touchesWall(_box) || touchesEnemy())
+	{
+		//Return true -> delete this bullet
+		return true;
+	}
 
 	//Decrease lifetime
 	_lifeTime--;
@@ -56,4 +70,19 @@ Bullet& Bullet::operator=(const Bullet& other)
 	_box.w = BULLET_WIDTH;
 	_box.h = BULLET_HEIGHT;
 	return *this;
+}
+
+bool Bullet::touchesEnemy()
+{
+	//Go through enemies
+	for (int i = 0; i < TOTAL_ENEMIES; ++i)
+	{
+		//If the collision box touches an enemy
+		if (SDL_HasIntersection(&_box, &enemies[i].getBox()))
+		{
+			return true;
+		}
+	}
+	//If no enemies were touched
+	return false;
 }

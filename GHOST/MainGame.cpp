@@ -22,6 +22,9 @@ Texture bulletTexture;
 //Bullets vector
 std::vector<Bullet> bullets;
 
+//Enemies array
+Enemy enemies[TOTAL_ENEMIES];
+
 MainGame::MainGame()
 {
 	//Initialize
@@ -182,7 +185,7 @@ void MainGame::gameLoop()
 	while (_gameState != GameState::EXIT)
 	{
 		//Process input
-		processInput();
+		processInput(_camera);
 		//Draw the game
 		drawGame();
 	}
@@ -191,7 +194,7 @@ void MainGame::gameLoop()
 	close();
 }
 
-void MainGame::processInput()
+void MainGame::processInput(SDL_Rect camera)
 {
 	//Event handler
 	SDL_Event e;
@@ -206,7 +209,7 @@ void MainGame::processInput()
 		}
 
 		//Handle input for the player
-		player.handleEvent(e);
+		player.handleEvent(e, camera);
 	}
 }
 

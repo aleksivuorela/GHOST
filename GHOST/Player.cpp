@@ -12,8 +12,8 @@ Player::Player()
 	//Initialize the position
 	_playerX = 0;
 	_playerY = 0;
-	_mouseX = 1200;
-	_mouseY = 1200;
+	_mouseX = 0;
+	_mouseY = 0;
 
 	//Initialize the velocity
 	_velX = 0;
@@ -27,33 +27,46 @@ Player::Player()
 
 }
 
-void Player::handleEvent(SDL_Event& e)
+void Player::handleEvent(SDL_Event& e, SDL_Rect camera)
 {
+	//If a mouse button was pressed
+	if (e.type == SDL_MOUSEBUTTONDOWN)
+	{
+		//If left mouse button was pressed
+		if (e.button.button == SDL_BUTTON_LEFT)
+		{ 
+			//Get mouse position relative to the camera
+			SDL_GetMouseState(&_mouseX, &_mouseY);
+			_mouseX += camera.x;
+			_mouseY += camera.y;
+			//Shoot towards the mouse position
+			shoot();
+		}
+	}
+
 	//If a key was pressed
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
 	{
-		//Arrow key was pressed, adjust the velocity
+		//Wasd key was pressed, adjust the velocity
 		switch (e.key.keysym.sym)
 		{
-		case SDLK_UP: _velY -= PLAYER_VEL; break;
-		case SDLK_DOWN: _velY += PLAYER_VEL; break;
-		case SDLK_LEFT: _velX -= PLAYER_VEL; break;
-		case SDLK_RIGHT: _velX += PLAYER_VEL; break;
-
-		// Space was pressed, shoot
-		case SDLK_SPACE: shoot(); break;
+		case SDLK_w: _velY -= PLAYER_VEL; break;
+		case SDLK_s: _velY += PLAYER_VEL; break;
+		case SDLK_a: _velX -= PLAYER_VEL; break;
+		case SDLK_d: _velX += PLAYER_VEL; break;
 		}
 	}
+
 	//If a key was released
 	else if (e.type == SDL_KEYUP && e.key.repeat == 0)
 	{
-		//Arrow key was released, adjust the velocity
+		//Wasd key was released, adjust the velocity
 		switch (e.key.keysym.sym)
 		{
-		case SDLK_UP: _velY += PLAYER_VEL; break;
-		case SDLK_DOWN: _velY -= PLAYER_VEL; break;
-		case SDLK_LEFT: _velX += PLAYER_VEL; break;
-		case SDLK_RIGHT: _velX -= PLAYER_VEL; break;
+		case SDLK_w: _velY += PLAYER_VEL; break;
+		case SDLK_s: _velY -= PLAYER_VEL; break;
+		case SDLK_a: _velX += PLAYER_VEL; break;
+		case SDLK_d: _velX -= PLAYER_VEL; break;
 		}
 	}
 }
@@ -121,8 +134,8 @@ void Player::setCamera(SDL_Rect& camera)
 void Player::shoot()
 {
 	//Create a vector in the direction that the bullet moves to (mouse cursor's position)
-	_distVec.x = _playerX - _mouseX;
-	_distVec.y = _playerY - _mouseY;
+	_distVec.x = _mouseX - _playerX;
+	_distVec.y = _mouseY - _playerY;
 
 	//Calculate the vector's length
 	_distLen = glm::length(_distVec);

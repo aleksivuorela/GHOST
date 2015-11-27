@@ -20,6 +20,9 @@ public:
 	//Any class put in a vector requires a copy assignment operator (or at least a move assignment operator in C++11)
 	Bullet& operator=(const Bullet& other);
 
+	//Checks collision against enemies
+	bool touchesEnemy();
+
 private:
 	//Lifetime of the bullet, when it reaches 0 the bullet is deleted
 	int _lifeTime;
@@ -38,8 +41,8 @@ private:
 	const float BULLET_VEL = 5;
 
 	//The dimensions of the bullet
-	const int BULLET_WIDTH = 20;
-	const int BULLET_HEIGHT = 20;
+	const int BULLET_WIDTH = 10;
+	const int BULLET_HEIGHT = 10;
 
 };
 

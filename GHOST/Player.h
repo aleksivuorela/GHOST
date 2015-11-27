@@ -13,7 +13,7 @@ public:
 	Player();
 
 	//Takes key presses and adjusts the player's velocity
-	void handleEvent(SDL_Event& e);
+	void handleEvent(SDL_Event& e, SDL_Rect camera);
 
 	//Moves the player and checks collision
 	void move(Enemy* enemies);
@@ -58,7 +58,7 @@ private:
 	float _playerX, _playerY;
 
 	//Position of the mouse cursor
-	float _mouseX, _mouseY;
+	int _mouseX, _mouseY;
 
 	//The velocity of the player
 	float _velX, _velY;

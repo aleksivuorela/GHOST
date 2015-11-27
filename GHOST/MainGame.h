@@ -20,6 +20,7 @@ extern Texture tileTexture;
 extern Texture enemyTexture;
 extern Texture bulletTexture;
 extern std::vector<Bullet> bullets;
+extern Enemy enemies[TOTAL_ENEMIES];
 
 //Game states
 enum class GameState { PLAY, EXIT };
@@ -47,7 +48,7 @@ private:
 	void gameLoop();
 
 	//Processes input with SDL
-	void processInput();
+	void processInput(SDL_Rect camera);
 
 	//Draws the game
 	void drawGame();
@@ -63,10 +64,6 @@ private:
 
 	//Player
 	Player player;
-
-	//Enemies
-	Enemy enemies[TOTAL_ENEMIES];
-
 
 };
 

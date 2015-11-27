@@ -64,13 +64,13 @@ void Enemy::idle()
 	if (_distLen < ENEMY_VISION_RANGE && checkLoS())
 	{
 		//Player spotted, alert! 
-		std::cout << "PLAYER SPOTTED, ATTACKING HIM!" << std::endl;
+		//std::cout << "PLAYER SPOTTED, ATTACKING HIM!" << std::endl;
 		// Insert a new element at the top of the stack (ALERT), above it's current top element
 		stateStack.push(State::ALERT);
 	}
 	//Just idling...
 	else
-		std::cout << "I am just chillin..." << std::endl;
+		;//std::cout << "I am just chillin..." << std::endl;
 }
 
 void Enemy::attack(float playerX, float playerY, SDL_Rect playerBox)
@@ -79,7 +79,7 @@ void Enemy::attack(float playerX, float playerY, SDL_Rect playerBox)
 	if (_distLen > ENEMY_VISION_RANGE || !checkLoS())
 	{
 		//Player got away, search for him!
-		std::cout << "Enemy got away! Going to search for him!" << std::endl;
+		//std::cout << "Enemy got away! Going to search for him!" << std::endl;
 		//Write down last known location of the player
 		_lastPosX = playerX;
 		_lastPosY = playerY;
@@ -96,7 +96,7 @@ void Enemy::attack(float playerX, float playerY, SDL_Rect playerBox)
 	//Attack player if he's close enough
 	else
 	{
-		std::cout << "I AM ATTACKING!" << std::endl;
+		//std::cout << "I AM ATTACKING!" << std::endl;
 	}
 }
 
@@ -107,13 +107,14 @@ void Enemy::search(SDL_Rect playerBox)
 
 	//Player is in vision range and can be seen -> found the player
 	if (_distLen < ENEMY_VISION_RANGE && checkLoS())
-	{ 
+	{
 		//Removes the element on top of the stack -> state back to ALERT
 		stateStack.pop();
 	}
 	else
+		;
 		//Searching for the player
-		std::cout << "Searching..." << std::endl;	
+		//std::cout << "Searching..." << std::endl;	
 }
 
 void Enemy::render(SDL_Rect& camera)
@@ -271,5 +272,6 @@ bool Enemy::checkLoS()
 	//No collision between the points in the line and the wall tiles in the level; can see the player -> return true
 	return true;
 }
+
 
 
