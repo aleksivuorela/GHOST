@@ -25,6 +25,8 @@ Player::Player()
 	//Initialize the length of the distance vector
 	_distLen = 0;
 
+	//Initialize hp
+	_hp = PLAYER_HP;
 }
 
 void Player::handleEvent(SDL_Event& e, SDL_Rect camera)
@@ -71,17 +73,17 @@ void Player::handleEvent(SDL_Event& e, SDL_Rect camera)
 	}
 }
 
-void Player::move(Enemy* enemies)
+void Player::move()
 {
 	//Move the player left or right
 	_playerX += _velX;
 	_box.x = (int)_playerX;
 	
 	//Go through the enemies
-	for (int i = 0; i < TOTAL_ENEMIES; ++i)
+	for (int i = 0; i < enemyVec.size(); ++i)
 	{
 		//If the player went too far to the left or right or touched a wall or an enemy
-		if (_playerX < 0 || _playerX + PLAYER_WIDTH > LEVEL_WIDTH || level.touchesWall(_box) || SDL_HasIntersection(&enemies[i].getBox(), &_box))
+		if (_playerX < 0 || _playerX + PLAYER_WIDTH > LEVEL_WIDTH || level.touchesWall(_box) || SDL_HasIntersection(&enemyVec[i].getBox(), &_box))
 		{
 			//Move back
 			_playerX -= _velX;
@@ -94,10 +96,10 @@ void Player::move(Enemy* enemies)
 	_box.y = (int)_playerY;
 
 	//Go through the enemies
-	for (int i = 0; i < TOTAL_ENEMIES; ++i)
+	for (int i = 0; i < enemyVec.size(); ++i)
 	{
 		//If the player went too far up or down or touched a wall or an enemy
-		if (_playerY < 0 || _playerY + PLAYER_HEIGHT > LEVEL_HEIGHT || level.touchesWall(_box) || SDL_HasIntersection(&enemies[i].getBox(), &_box))
+		if (_playerY < 0 || _playerY + PLAYER_HEIGHT > LEVEL_HEIGHT || level.touchesWall(_box) || SDL_HasIntersection(&enemyVec[i].getBox(), &_box))
 		{
 			//Move back
 			_playerY -= _velY;
@@ -145,7 +147,7 @@ void Player::shoot()
 	_distVec.y /= _distLen;
 
 	//Add new bullet at the end of the bullets vector
-	bullets.emplace_back(_playerX, _playerY, _distVec);
+	bulletVec.emplace_back(_playerX, _playerY, _distVec);
 }
 
 bool Player::loadTexture()
@@ -185,3 +187,26 @@ float Player::getY()
 {
 	return _playerY;
 }
+
+void Player::takeDamage(int amount)
+{
+	//Reduce health points by given amount
+	_hp -= amount;
+	//If health points reach 0
+	if (_hp <= 0)
+	{
+		//Player dies -> game over
+		victory = 0;
+		gameState = GameState::OVER;
+	}
+}
+
+void Player::restart()
+{
+	_playerX = 0;
+	_box.x = (int)_playerX;
+	_playerY = 0;
+	_box.y = (int)_playerY;
+	_hp = PLAYER_HP;
+}
+

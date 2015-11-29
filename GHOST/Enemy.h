@@ -10,17 +10,14 @@
 //States
 enum class State { NORMAL, ALERT, EVASION };
 
-//The total amount of enemies
-const int TOTAL_ENEMIES = 3;
-
 class Enemy
 {
 public:
 	//Initializes the variables
-	Enemy();
+	Enemy(float enemyX, float enemyY);
 
-	//Updates behavior based on the currently active state
-	void update(float playerX, float playerY, SDL_Rect playerBox);
+	//Updates behavior based on the currently active state, returns true if out of health points -> delete
+	bool update(float playerX, float playerY, SDL_Rect playerBox);
 
 	//Idling
 	void idle();
@@ -43,9 +40,6 @@ public:
 	//Moves the enemy towards the player and checks collision
 	void move(glm::vec2 vec, SDL_Rect playerBox);
 
-	//Set the enemy's position
-	void setPosition(float posX, float posY);
-
 	//Checks the distance between the enemy and the player
 	void checkDistance(float playerX, float playerY);
 
@@ -58,6 +52,13 @@ public:
 	//Checks line of sight. If the line collides with a wall tile (there is an obstruction in sight), the enemy can't see the player. If it doesn't, the enemy can see the player.
 	//Returns true if the enemy can see the player
 	bool checkLoS();
+
+	//Enemy takes given amount of damage; returns true if health points reach 0 -> enemy dies and is deleted from enemies vector
+	bool takeDamage(int amount);
+
+	//Move assignment operator
+	//Any class put in a vector requires a copy assignment operator (or at least a move assignment operator in C++11)
+	Enemy& operator=(const Enemy& other);
 
 private:
 	//Collision box of the enemy
@@ -88,7 +89,7 @@ private:
 	const float ENEMY_VISION_RANGE = 300;
 
 	//Attack range of the enemy
-	const float ENEMY_ATTACK_RANGE = 200;
+	const float ENEMY_ATTACK_RANGE = 25;
 
 	//The dimensions of the enemy
 	const int ENEMY_WIDTH = 20;
@@ -99,6 +100,15 @@ private:
 
 	//Vector of all the points in the line
 	std::vector <SDL_Rect> points;
+
+	//Health points of the enemy
+	int _hp;
+
+	//Attack damage of the enemy
+	const int ENEMY_DMG = 10;
+
+	//Starting hp
+	const int ENEMY_HP = 30;
 
 protected:
 	//Stack of states; top element is the currently active state

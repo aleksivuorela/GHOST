@@ -16,7 +16,7 @@ public:
 	void handleEvent(SDL_Event& e, SDL_Rect camera);
 
 	//Moves the player and checks collision
-	void move(Enemy* enemies);
+	void move();
 
 	//Centers the camera over the player
 	void setCamera(SDL_Rect& camera);
@@ -39,6 +39,12 @@ public:
 	//Get player's position
 	float getX();
 	float getY();
+
+	//Player takes given amount of damage, if health points reach 0 -> game over
+	void takeDamage(int amount);
+
+	//Restart player
+	void restart();
 
 private:
 	//The dimensions of the player
@@ -68,6 +74,12 @@ private:
 
 	//Length of the distance vector
 	float _distLen;
+
+	//Health points of the player
+	int _hp;
+
+	//Starting hp
+	const int PLAYER_HP = 100;
 
 };
 

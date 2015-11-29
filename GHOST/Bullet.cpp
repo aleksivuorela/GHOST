@@ -51,7 +51,7 @@ bool Bullet::update()
 	//Decrease lifetime
 	_lifeTime--;
 
-	//If lifetime reaches 0, return true
+	//If lifetime reaches 0, return true -> delete this bullet
 	if (_lifeTime == 0)
 	{
 		return true;
@@ -75,14 +75,18 @@ Bullet& Bullet::operator=(const Bullet& other)
 bool Bullet::touchesEnemy()
 {
 	//Go through enemies
-	for (int i = 0; i < TOTAL_ENEMIES; ++i)
+	for (int i = 0; i < enemyVec.size(); ++i)
 	{
 		//If the collision box touches an enemy
-		if (SDL_HasIntersection(&_box, &enemies[i].getBox()))
+		if (SDL_HasIntersection(&_box, &enemyVec[i].getBox()))
 		{
+			//Deal damage to the enemy
+			enemyVec[i].takeDamage(BULLET_DMG);
+
+			//Return true if an enemy was touched
 			return true;
 		}
 	}
-	//If no enemies were touched
+	//If no enemies were touched return false
 	return false;
 }

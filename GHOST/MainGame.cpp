@@ -4,6 +4,9 @@
 #include <iostream>
 #include <SDL_image.h>
 
+//Player
+Player player;
+
 //Level
 Level level;
 
@@ -20,20 +23,27 @@ Texture enemyTexture;
 Texture bulletTexture;
 
 //Bullets vector
-std::vector<Bullet> bullets;
+std::vector<Bullet> bulletVec;
 
-//Enemies array
-Enemy enemies[TOTAL_ENEMIES];
+//Enemies vector
+std::vector<Enemy> enemyVec;
+
+//State of the game
+GameState gameState;
+
+//Victory = 1, defeat = 0
+bool victory;
 
 MainGame::MainGame()
 {
 	//Initialize
 	_window = NULL;
-	_gameState = GameState::PLAY;
 	_camera.x = 0;
 	_camera.y = 0;
 	_camera.w = SCREEN_WIDTH;
 	_camera.h = SCREEN_HEIGHT;
+	gameState = GameState::PLAY;
+	victory = 0;
 }
 
 void MainGame::run()
@@ -107,15 +117,9 @@ bool MainGame::init()
 					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
 					success = false;
 				}
-
-				//Initialize enemies starting positions
-				enemies[0].setPosition(300, 200);
-				enemies[1].setPosition(700, 700);
-				enemies[2].setPosition(900, 500);
 			}
 		}
 	}
-
 	return success;
 }
 
@@ -167,6 +171,7 @@ void MainGame::close()
 	player.free();
 	tileTexture.free();
 	enemyTexture.free();
+	bulletTexture.free();
 
 	//Destroy window    
 	SDL_DestroyRenderer(renderer);
@@ -181,17 +186,36 @@ void MainGame::close()
 
 void MainGame::gameLoop()
 {
-	//Will loop until _gameState is set to EXIT
-	while (_gameState != GameState::EXIT)
+	//Will loop until gameState is no longer set to PLAY
+	while (gameState == GameState::PLAY)
 	{
 		//Process input
 		processInput(_camera);
-		//Draw the game
-		drawGame();
+		//Play the game
+		playGame();
 	}
 
-	//Free resources and close SDL
-	close();
+	//Game is over
+	if (gameState == GameState::OVER)
+	{
+		if (gameOver())
+		{
+			//User wants to restart the game
+			restart();
+		}
+		else
+		{ 
+			//Free resources and close SDL
+			close();
+		}
+	}
+
+	//User wants to quit 
+	if (gameState == GameState::EXIT) 
+	{
+		//Free resources and close SDL
+		close();
+	}
 }
 
 void MainGame::processInput(SDL_Rect camera)
@@ -205,7 +229,7 @@ void MainGame::processInput(SDL_Rect camera)
 		//User requests quit
 		if (e.type == SDL_QUIT)
 		{
-			_gameState = GameState::EXIT;
+			gameState = GameState::EXIT;
 		}
 
 		//Handle input for the player
@@ -213,28 +237,46 @@ void MainGame::processInput(SDL_Rect camera)
 	}
 }
 
-void MainGame::drawGame()
+void MainGame::playGame()
 {
 	//Move player
-	player.move(enemies);
+	player.move();
 	player.setCamera(_camera);
 
 	//Update enemies
-	for (int i = 0; i < TOTAL_ENEMIES; i++)
+	for (int i = 0; i < enemyVec.size();)
 	{
-		enemies[i].update(player.getX(), player.getY(), player.getBox());
+		if (enemyVec[i].update(player.getX(), player.getY(), player.getBox()))
+		{
+			//Little trick to easily delete element from vector; swap with the last element of the vector and remove the last element
+			enemyVec[i] = enemyVec.back();
+			enemyVec.pop_back();
+		}
+		//Only increment i if an enemy wasn't deleted (if i++ is inside for(), skips over the enemy that is in enemyVec.back())
+		else
+		{
+			i++;
+		}
 	}
 
-	//Update bullets
-	for (int i = 0; i < bullets.size();)
+	//Check if no enemies are left
+	if (enemyVec.empty())
 	{
-		if (bullets[i].update() == true)
+		//Victory!
+		victory = 1;
+		gameState = GameState::OVER;
+	}
+	
+	//Update bullets
+	for (int i = 0; i < bulletVec.size();)
+	{
+		if (bulletVec[i].update())
 		{
-			//Little trick to easily delete element from vector; swap with the last element of the vector
-			bullets[i] = bullets.back();
-			bullets.pop_back();
+			//Little trick to easily delete element from vector; swap with the last element of the vector and remove the last element
+			bulletVec[i] = bulletVec.back();
+			bulletVec.pop_back();
 		}
-		//Only increment i if bullet wasn't deleted (if i++ is inside for(), skips over the bullet that is in bullets.back())
+		//Only increment i if a bullet wasn't deleted (if i++ is inside for(), skips over the bullet that is in bulletVec.back())
 		else
 		{
 			i++;
@@ -252,17 +294,44 @@ void MainGame::drawGame()
 	player.render(_camera);
 
 	//Render enemies
-	for (int i = 0; i < TOTAL_ENEMIES; i++)
+	for (int i = 0; i < enemyVec.size(); i++)
 	{
-		enemies[i].render(_camera);
+		enemyVec[i].render(_camera);
 	}
 
 	//Render bullets
-	for (int i = 0; i < bullets.size(); i++)
+	for (int i = 0; i < bulletVec.size(); i++)
 	{
-		bullets[i].render(_camera);
+		bulletVec[i].render(_camera);
 	}
 
 	//Update screen
 	SDL_RenderPresent(renderer);
+}
+
+bool MainGame::gameOver()
+{
+	if (victory)
+	{
+		std::cout << "Victory!\n";
+	}
+	else
+	{ 
+		std::cout << "Defeat!\n";
+	}
+
+	std::cout << "Restart? (1/0)\n";
+	int vastaus;
+	std::cin >> vastaus;
+	if (vastaus == 1) return true;
+	else return false;
+}
+
+void MainGame::restart()
+{
+	gameState = GameState::PLAY;
+	enemyVec.clear();
+	level.setTiles();
+	player.restart();
+	gameLoop();
 }

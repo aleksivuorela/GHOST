@@ -13,7 +13,7 @@ public:
 	//Shows the bullet on the screen
 	void render(SDL_Rect& camera);
 
-	//Updates the bullet's position and lifetime, returns true when out of life -> delete
+	//Updates the bullet's position and lifetime, returns true if the bullet went too far to the left or right or touched a wall or an enemy or when out of life -> delete
 	bool update();
 
 	//Move assignment operator
@@ -43,6 +43,9 @@ private:
 	//The dimensions of the bullet
 	const int BULLET_WIDTH = 10;
 	const int BULLET_HEIGHT = 10;
+
+	//Bullet damage
+	const int BULLET_DMG = 10;
 
 };
 

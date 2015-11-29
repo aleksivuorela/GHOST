@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "MainGame.h"
 #include <fstream>
 
 Level::Level()
@@ -17,7 +18,7 @@ bool Level::setTiles()
 	std::ifstream map("levels/level1.map");
 	if (map) 
 	{
-		// The map file exists, and is open for input
+		//The map file exists, and is open for input
 		//Initialize the tiles
 		for (int i = 0; i < TOTAL_TILES; ++i)
 		{
@@ -39,8 +40,20 @@ bool Level::setTiles()
 			//If the number is a valid tile number
 			if ((tileType >= 0) && (tileType < TOTAL_TILE_SPRITES))
 			{
+				//Create a new tile
 				tiles[i] = new Tile(x, y, tileType);
 			}
+
+			//If there is an enemy on the tile
+			else if (tileType == 66)
+			{
+				//Create a new standard tile (tileType = 0)
+				tiles[i] = new Tile(x, y, 0);
+
+				//Create a new enemy at the middle of the tile (+40 to x and y)
+				enemyVec.emplace_back(x+40, y+40);
+			}
+
 			//If the tile type isn't recognized 
 			else
 			{

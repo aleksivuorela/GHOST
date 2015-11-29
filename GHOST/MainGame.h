@@ -13,17 +13,20 @@
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
 
+//Game states
+enum class GameState { PLAY, EXIT, OVER };
+
 //Declare globally used objects extern so that any file that includes this header file will then see the same global objects
+extern Player player;
 extern Level level;
 extern SDL_Renderer* renderer;
 extern Texture tileTexture;
 extern Texture enemyTexture;
 extern Texture bulletTexture;
-extern std::vector<Bullet> bullets;
-extern Enemy enemies[TOTAL_ENEMIES];
-
-//Game states
-enum class GameState { PLAY, EXIT };
+extern std::vector<Bullet> bulletVec;
+extern std::vector<Enemy> enemyVec;
+extern GameState gameState;
+extern bool victory;
 
 class MainGame
 {
@@ -50,20 +53,20 @@ private:
 	//Processes input with SDL
 	void processInput(SDL_Rect camera);
 
-	//Draws the game
-	void drawGame();
+	//Plays the game
+	void playGame();
+
+	//Restarts the game
+	void restart();
+
+	//Game over, returns true if user wants to restart
+	bool gameOver();
 
 	//The window that is being rendered to
 	SDL_Window* _window;
 
-	//Game state
-	GameState _gameState;
-
 	//The camera area
 	SDL_Rect _camera;
-
-	//Player
-	Player player;
 
 };
 

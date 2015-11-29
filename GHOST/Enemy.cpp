@@ -1,17 +1,17 @@
 #include "Enemy.h"
 #include "MainGame.h"
 
-Enemy::Enemy()
+Enemy::Enemy(float enemyX, float enemyY)
 {
 	//Initialize the collision box
-	_box.x = 0;
-	_box.y = 0;
+	_box.x = (int)enemyX;
+	_box.y = (int)enemyY;
 	_box.w = ENEMY_WIDTH;
 	_box.h = ENEMY_HEIGHT;
 
 	//Initialize the position
-	_enemyX = 0;
-	_enemyY = 0;
+	_enemyX = enemyX;
+	_enemyY = enemyY;
 
 	//Initialize the vectors
 	_distVec = glm::vec2(0, 0);
@@ -28,9 +28,11 @@ Enemy::Enemy()
 	//Initialize the currently active state
 	stateStack.push(State::NORMAL);
 
+	//Initialize hp
+	_hp = ENEMY_HP;
 }
 
-void Enemy::update(float playerX, float playerY, SDL_Rect playerBox)
+bool Enemy::update(float playerX, float playerY, SDL_Rect playerBox)
 {
 	//Check distance 
 	checkDistance(playerX, playerY);
@@ -56,6 +58,13 @@ void Enemy::update(float playerX, float playerY, SDL_Rect playerBox)
 		search(playerBox);
 		break;
 	}
+
+	//If health points reach 0, return true -> delete this enemy
+	if (_hp <= 0)
+	{
+		return true;
+	}
+	return false;
 }
 
 void Enemy::idle()
@@ -96,7 +105,7 @@ void Enemy::attack(float playerX, float playerY, SDL_Rect playerBox)
 	//Attack player if he's close enough
 	else
 	{
-		//std::cout << "I AM ATTACKING!" << std::endl;
+		player.takeDamage(ENEMY_DMG);
 	}
 }
 
@@ -163,14 +172,6 @@ void Enemy::move(glm::vec2 vec, SDL_Rect playerBox)
 		_enemyY -= vec.y * ENEMY_VEL;
 		_box.y = (int)_enemyY;
 	}
-}
-
-void Enemy::setPosition(float posX, float posY)
-{
-	_enemyX = posX;
-	_box.x = (int)_enemyX;
-	_enemyY = posY;
-	_box.y = (int)_enemyY;
 }
 
 void Enemy::checkDistance(float playerX, float playerY)
@@ -273,5 +274,37 @@ bool Enemy::checkLoS()
 	return true;
 }
 
+bool Enemy::takeDamage(int amount)
+{
+	//Reduce health points by given amount
+	_hp -= amount;
+	//If health points reach 0
+	if (_hp <= 0)
+	{
+		//Enemy dies -> return true
+		return true;
+	}
+	else 
+		return false;
+}
+
+Enemy& Enemy::operator=(const Enemy& other)
+{
+	_box.x = other._box.x;
+	_box.y = other._box.y;
+	_box.w = ENEMY_WIDTH;
+	_box.h = ENEMY_HEIGHT;
+	_enemyX = other._enemyX;
+	_enemyY = other._enemyY;
+	_distVec = other._distVec;
+	_lastPosVec = other._lastPosVec;
+	_distLen = other._distLen;
+	_lastPosLen = other._lastPosLen;
+	_lastPosX = other._lastPosX;
+	_lastPosY = other._lastPosY;
+	_hp = ENEMY_HP;
+	stateStack.push(State::NORMAL);
+	return *this;
+}
 
 
