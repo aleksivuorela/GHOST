@@ -1,2 +1,2 @@
 # GHOST
-2D tile-based game in C++ using SDL
+2D top-down tile-based shooter game in C++ using SDL
